@@ -25,6 +25,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
+// test
 // ZunProvider implements the virtual-kubelet provider interface and communicates with OpenStack's Zun APIs.
 type ZunProvider struct {
 	ZunClient          *gophercloud.ServiceClient
