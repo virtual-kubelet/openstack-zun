@@ -1,3 +1,5 @@
 - project:
-    templates:
-      - noop-jobs
+    name: virtual-kubelet/openstack-zun
+    check:
+      jobs:
+        - init-test
