@@ -393,7 +393,7 @@ func capsuleToPod(capsule *capsules.CapsuleV132) (*v1.Pod, error) {
 
 		Status: v1.PodStatus{
 			Phase:             zunStatusToPodPhase(capsule.Status),
-			Conditions:        []v1.PodCondition{},
+			Conditions:        zunStatusToPodConditions(capsule.Status, podCreationTimestamp),
 			Message:           "",
 			Reason:            "",
 			HostIP:            "",
@@ -507,6 +507,28 @@ func zunStatusToPodPhase(status string) v1.PodPhase {
 	}
 
 	return v1.PodUnknown
+}
+
+func zunStatusToPodConditions(status string, transitiontime metav1.Time) []v1.PodCondition {
+	switch status {
+	case "Running":
+		return []v1.PodCondition{
+			v1.PodCondition{
+				Type:               v1.PodReady,
+				Status:             v1.ConditionTrue,
+				LastTransitionTime: transitiontime,
+			}, v1.PodCondition{
+				Type:               v1.PodInitialized,
+				Status:             v1.ConditionTrue,
+				LastTransitionTime: transitiontime,
+			}, v1.PodCondition{
+				Type:               v1.PodScheduled,
+				Status:             v1.ConditionTrue,
+				LastTransitionTime: transitiontime,
+			},
+		}
+	}
+	return []v1.PodCondition{}
 }
 
 // Capacity returns a resource list containing the capacity limits set for Zun.
