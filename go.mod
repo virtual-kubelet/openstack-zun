@@ -8,17 +8,14 @@ require (
 	github.com/docker/spdystream v0.0.0-20181023171402-6480d4af844c // indirect
 	github.com/golang/groupcache v0.0.0-20190129154638-5b532d6fd5ef // indirect
 	github.com/gophercloud/gophercloud v0.2.0
-	github.com/gorilla/mux v1.7.2 // indirect
-	github.com/imdario/mergo v0.3.7 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/pkg/errors v0.8.1
-	github.com/sirupsen/logrus v1.4.1
+	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/pflag v1.0.3
+	github.com/virtual-kubelet/node-cli v0.1.2
 	github.com/virtual-kubelet/virtual-kubelet v1.2.1
 	go.opencensus.io v0.22.0
-	golang.org/x/oauth2 v0.0.0-20190402181905-9f3314589c9a // indirect
 	google.golang.org/appengine v1.5.0 // indirect
 	k8s.io/api v0.0.0
 	k8s.io/apimachinery v0.0.0

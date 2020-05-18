@@ -16,9 +16,9 @@ import (
 	"github.com/gophercloud/gophercloud/openstack"
 	"github.com/gophercloud/gophercloud/openstack/container/v1/capsules"
 	"github.com/gophercloud/gophercloud/pagination"
-	"github.com/virtual-kubelet/virtual-kubelet/manager"
+	"github.com/virtual-kubelet/node-cli/manager"
+	"github.com/virtual-kubelet/node-cli/provider"
 	"github.com/virtual-kubelet/virtual-kubelet/node/api"
-	"github.com/virtual-kubelet/virtual-kubelet/providers"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -221,6 +221,12 @@ func (p *ZunProvider) RunInContainer(ctx context.Context, namespace, name, conta
 	return nil
 }
 
+// ConfigureNode enables a provider to configure the node object that
+// will be used for Kubernetes.
+func (p *ZunProvider) ConfigureNode(ctx context.Context, node *v1.Node) {
+	// noop
+}
+
 // GetPodStatus returns the status of a pod by name that is running inside Zun
 // returns nil if a pod by that name is not found.
 func (p *ZunProvider) GetPodStatus(ctx context.Context, namespace, name string) (*v1.PodStatus, error) {
@@ -307,7 +313,7 @@ func (p *ZunProvider) NodeDaemonEndpoints(ctx context.Context) *v1.NodeDaemonEnd
 // OperatingSystem returns the operating system for this provider.
 // This is a noop to default to Linux for now.
 func (p *ZunProvider) OperatingSystem() string {
-	return providers.OperatingSystemLinux
+	return provider.OperatingSystemLinux
 }
 
 func capsuleToPod(capsule *capsules.CapsuleV132) (*v1.Pod, error) {
