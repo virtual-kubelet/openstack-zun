@@ -17,7 +17,6 @@ import (
 	"github.com/gophercloud/gophercloud/openstack/container/v1/capsules"
 	"github.com/gophercloud/gophercloud/pagination"
 	"github.com/virtual-kubelet/node-cli/manager"
-	"github.com/virtual-kubelet/node-cli/provider"
 	"github.com/virtual-kubelet/virtual-kubelet/node/api"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -224,7 +223,12 @@ func (p *ZunProvider) RunInContainer(ctx context.Context, namespace, name, conta
 // ConfigureNode enables a provider to configure the node object that
 // will be used for Kubernetes.
 func (p *ZunProvider) ConfigureNode(ctx context.Context, node *v1.Node) {
-	// noop
+	node.Status.Capacity = p.capacity()
+	node.Status.Allocatable = p.capacity()
+	node.Status.Conditions = p.nodeConditions()
+	node.Status.Addresses = p.nodeAddresses()
+	node.Status.DaemonEndpoints = p.nodeDaemonEndpoints()
+	node.Status.NodeInfo.OperatingSystem = p.operatingSystem
 }
 
 // GetPodStatus returns the status of a pod by name that is running inside Zun
@@ -246,9 +250,9 @@ func (p *ZunProvider) GetContainerLogs(ctx context.Context, namespace, podName, 
 	return ioutil.NopCloser(strings.NewReader("not support in Zun Provider")), nil
 }
 
-// NodeConditions returns a list of conditions (Ready, OutOfDisk, etc), for updates to the node status
+// nodeConditions returns a list of conditions (Ready, OutOfDisk, etc), for updates to the node status
 // within Kubernetes.
-func (p *ZunProvider) NodeConditions(ctx context.Context) []v1.NodeCondition {
+func (p *ZunProvider) nodeConditions() []v1.NodeCondition {
 	// TODO: Make these dynamic and augment with custom Zun specific conditions of interest
 	return []v1.NodeCondition{
 		{
@@ -294,26 +298,20 @@ func (p *ZunProvider) NodeConditions(ctx context.Context) []v1.NodeCondition {
 	}
 }
 
-// NodeAddresses returns a list of addresses for the node status
+// nodeAddresses returns a list of addresses for the node status
 // within Kubernetes.
-func (p *ZunProvider) NodeAddresses(ctx context.Context) []v1.NodeAddress {
+func (p *ZunProvider) nodeAddresses() []v1.NodeAddress {
 	return nil
 }
 
-// NodeDaemonEndpoints returns NodeDaemonEndpoints for the node status
+// nodeDaemonEndpoints returns NodeDaemonEndpoints for the node status
 // within Kubernetes.
-func (p *ZunProvider) NodeDaemonEndpoints(ctx context.Context) *v1.NodeDaemonEndpoints {
-	return &v1.NodeDaemonEndpoints{
+func (p *ZunProvider) nodeDaemonEndpoints() v1.NodeDaemonEndpoints {
+	return v1.NodeDaemonEndpoints{
 		KubeletEndpoint: v1.DaemonEndpoint{
 			Port: p.daemonEndpointPort,
 		},
 	}
-}
-
-// OperatingSystem returns the operating system for this provider.
-// This is a noop to default to Linux for now.
-func (p *ZunProvider) OperatingSystem() string {
-	return provider.OperatingSystemLinux
 }
 
 func capsuleToPod(capsule *capsules.CapsuleV132) (*v1.Pod, error) {
@@ -537,8 +535,8 @@ func zunStatusToPodConditions(status string, transitiontime metav1.Time) []v1.Po
 	return []v1.PodCondition{}
 }
 
-// Capacity returns a resource list containing the capacity limits set for Zun.
-func (p *ZunProvider) Capacity(ctx context.Context) v1.ResourceList {
+// capacity returns a resource list containing the capacity limits set for Zun.
+func (p *ZunProvider) capacity() v1.ResourceList {
 	return v1.ResourceList{
 		"cpu":    resource.MustParse(p.cpu),
 		"memory": resource.MustParse(p.memory),
